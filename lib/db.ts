@@ -2,14 +2,22 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Bar, Signal, SignalRow } from "./types";
 
-let client: SupabaseClient | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let client: SupabaseClient<any, any, any> | null = null;
 
-export function db(): SupabaseClient {
+/** Tables live in their own schema so the project can be shared with other apps */
+export const SCHEMA = process.env.SUPABASE_SCHEMA || "signal_desk";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function db(): SupabaseClient<any, any, any> {
   if (client) return client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set");
-  client = createClient(url, key, { auth: { persistSession: false } });
+  // Accept the names the Vercel <-> Supabase integration injects, as well as manual ones
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) {
+    throw new Error("Supabase env vars missing: need SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SECRET_KEY)");
+  }
+  client = createClient(url, key, { auth: { persistSession: false }, db: { schema: SCHEMA } });
   return client;
 }
 

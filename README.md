@@ -36,8 +36,8 @@ This is a long-only replay over roughly the last 12 months. A signal on day *i* 
 
 ## Setup
 
-1. **Supabase:** create a project, open the SQL editor and run `supabase/schema.sql`. This creates the tables and a starter watchlist.
-2. **Env vars:** copy `.env.example` to `.env.local` and fill it in. Add the same values in Vercel under Project -> Settings -> Environment Variables.
+1. **Supabase:** in a new or existing project, open the SQL editor and run `supabase/schema.sql`. This creates a separate `signal_desk` schema with the tables and a starter watchlist, so it can share a project with your other apps. Then go to **Integrations -> Data API -> Settings** and add `signal_desk` to **Exposed schemas**.
+2. **Env vars:** if Supabase is connected through the Vercel integration, the Supabase URL and keys are already set. Add `CRON_SECRET`, `APP_PASSCODE` and `SUPABASE_SCHEMA=signal_desk` in Vercel under Project -> Settings -> Environment Variables, then run `vercel env pull .env.local` for local dev. Otherwise, copy `.env.example` to `.env.local` and fill it in.
 3. **Run locally:** run `npm install`, then `npm run dev`.
 4. **First data load:** with the dev server running:
    ```bash
