@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { ActionBadge, Pct, ScoreBar, Sparkline } from "@/components/bits";
+import HomeCharts from "@/components/HomeCharts";
 import { AddTickerForm } from "@/components/WatchlistForms";
+import SetupPanel from "@/components/SetupPanel";
 import { getBars, getLatestSignals, getWatchlist } from "@/lib/db";
+import { errorMessage, runHealthChecks } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 
 const WINDOW = 30;
 
-export default async function Home() {
+async function loadRows() {
   const [watchlist, signals] = await Promise.all([getWatchlist(), getLatestSignals()]);
   const sigMap = new Map(signals.map((s) => [s.ticker, s]));
-
   const rows = await Promise.all(
     watchlist.map(async (w) => {
       const bars = await getBars(w.ticker, WINDOW + 1);
@@ -19,6 +21,19 @@ export default async function Home() {
       return { ...w, closes: closes.slice(-WINDOW), change, signal: sigMap.get(w.ticker) };
     }),
   );
+  return { rows, signals };
+}
+
+export default async function Home() {
+  let data: Awaited<ReturnType<typeof loadRows>>;
+  try {
+    data = await loadRows();
+  } catch (e) {
+    const message = errorMessage(e);
+    console.error("[home] failed to load:", message);
+    return <SetupPanel error={message} checks={await runHealthChecks()} />;
+  }
+  const { rows, signals } = data;
   rows.sort((a, b) => (b.signal?.score ?? -999) - (a.signal?.score ?? -999));
 
   const count = (a: string) => rows.filter((r) => r.signal?.action === a).length;
@@ -41,6 +56,9 @@ export default async function Home() {
         <div className="stat"><div className="label">Sell signals</div><div className="value down">{count("SELL")}</div></div>
       </div>
 
+      <HomeCharts stocks={rows.map((r) => ({ ticker: r.ticker, name: r.name }))} />
+
+      <h2>Signals</h2>
       <div className="panel" style={{ padding: 0, overflowX: "auto" }}>
         <table>
           <thead>

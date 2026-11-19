@@ -81,3 +81,18 @@ button:disabled { opacity: .6; cursor: wait; }
 .legend i { display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: middle; border-radius: 2px; }
 .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
 code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+/* Range charts */
+.chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 860px) { .chart-grid { grid-template-columns: 1fr; } }
+.segmented { display: inline-flex; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+.segmented button { background: transparent; color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 13px; }
+.segmented button.active { background: var(--accent); color: #fff; }
+.segmented button:hover:not(.active) { color: var(--text); }
+.range-chart { position: relative; }
+.chart-placeholder { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; text-align: center; padding: 0 12px; }
+.chart-dot { position: absolute; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 0 3px rgba(0,0,0,.4); }
+.x-labels { position: relative; height: 16px; margin-top: -18px; pointer-events: none; }
+.x-labels span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.x-labels span:first-child { transform: none; }
+.x-labels span:last-child { transform: translateX(-100%); }

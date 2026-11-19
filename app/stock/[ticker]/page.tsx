@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import EquityChart from "@/components/EquityChart";
 import PriceChart from "@/components/PriceChart";
+import RangeChart from "@/components/RangeChart";
 import { ActionBadge, Pct, ScoreBar } from "@/components/bits";
 import { RemoveTickerForm } from "@/components/WatchlistForms";
 import { backtest } from "@/lib/backtest";
@@ -66,6 +67,10 @@ export default async function StockPage({ params }: { params: Promise<{ ticker: 
         </div>
       </div>
 
+      <div className="panel">
+        <RangeChart ticker={ticker} height={260} />
+      </div>
+
       <div className="grid grid-4">
         <div className="stat"><div className="label">30d range</div><div className="mono">{lo30.toFixed(2)} - {hi30.toFixed(2)}</div></div>
         <div className="stat"><div className="label">RSI (14)</div><div className="mono">{Number.isFinite(r) ? r.toFixed(1) : "-"}</div></div>
@@ -75,7 +80,7 @@ export default async function StockPage({ params }: { params: Promise<{ ticker: 
 
       <div className="grid grid-2">
         <div className="panel">
-          <h2>Last {WINDOW} trading days</h2>
+          <h2>Technical view - last {WINDOW} trading days</h2>
           <PriceChart
             bars={windowBars}
             fast={view(ind.fast)}
